@@ -38,6 +38,16 @@
                ReferencedContainer = "container:scb-recruitment-task.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "71BC13A925D98AFC005056EC"
+               BuildableName = "scb-recruitment-taskTests.xctest"
+               BlueprintName = "scb-recruitment-taskTests"
+               ReferencedContainer = "container:scb-recruitment-task.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
