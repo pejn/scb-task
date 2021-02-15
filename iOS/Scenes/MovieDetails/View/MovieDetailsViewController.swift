@@ -69,7 +69,6 @@ final class MovieDetailsViewController: UIViewController {
         guard loadingIndicator.superview != nil else {
             return
         }
-        loadingIndicator.stopAnimating()
         loadingIndicator.removeFromSuperview()
     }
 }

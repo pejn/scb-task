@@ -15,7 +15,6 @@ final class MoviesListViewController: UIViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.register(MoviesListCell.self, forCellWithReuseIdentifier: MoviesListCell.identifier)
-        collectionView.register(LoadingCell.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: LoadingCell.identifier)
         collectionView.backgroundColor = .systemBackground
         return collectionView
     }()
@@ -24,6 +23,13 @@ final class MoviesListViewController: UIViewController {
         label.textAlignment = .center
         label.backgroundColor = .systemBackground
         return label
+    }()
+    private lazy var loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.color = .red
+        indicator.backgroundColor = .systemBackground
+        indicator.height(120)
+        return indicator
     }()
     private let viewModel: MoviesListViewModelType
     
@@ -56,7 +62,7 @@ final class MoviesListViewController: UIViewController {
                 return
             }
             self.hideError()
-            self.collectionView.collectionViewLayout.invalidateLayout()
+            self.stopLoading()
             switch result {
             case .success(let movies):
                 let currentlyDisplayedModelCount = self.viewModel.model.count - movies.count
@@ -69,7 +75,7 @@ final class MoviesListViewController: UIViewController {
             case nil:
                 self.collectionView.reloadData()
             case .loading:
-                break
+                self.startLoading()
             }
         }
     }
@@ -91,6 +97,22 @@ final class MoviesListViewController: UIViewController {
     private func hideError() {
         errorLabel.text = nil
         errorLabel.isHidden = true
+    }
+    
+    private func startLoading() {
+        guard loadingIndicator.superview == nil else {
+            return
+        }
+        view.addSubview(loadingIndicator)
+        loadingIndicator.edgesToSuperview(excluding: .top)
+        loadingIndicator.startAnimating()
+    }
+    
+    private func stopLoading() {
+        guard loadingIndicator.superview != nil else {
+            return
+        }
+        loadingIndicator.removeFromSuperview()
     }
 }
 
@@ -114,22 +136,11 @@ extension MoviesListViewController: UICollectionViewDelegateFlowLayout {
         let width = availableWidth / numberOfColumns
         return CGSize(width: width, height: width * 1.5)
     }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
-        if case .loading = viewModel.result.value {
-            return CGSize(width: collectionView.frame.width, height: 80)
-        }
-        return .zero
-    }
 }
 
 extension MoviesListViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewModel.model.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        return collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: LoadingCell.identifier, for: indexPath)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
