@@ -20,8 +20,7 @@ final class MoviesListViewController: UIViewController {
         return collectionView
     }()
     private lazy var errorLabel: UILabel = {
-        let label = UILabel()
-        label.numberOfLines = 0
+        let label = UILabel(numberOfLines: 0)
         label.textAlignment = .center
         label.backgroundColor = .systemBackground
         return label
@@ -32,13 +31,14 @@ final class MoviesListViewController: UIViewController {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     override func loadView() {
         super.loadView()
+        
         view.addSubview(collectionView)
         view.addSubview(errorLabel)
         collectionView.edgesToSuperview()
@@ -55,23 +55,21 @@ final class MoviesListViewController: UIViewController {
             guard let self = self else {
                 return
             }
-            DispatchQueue.main.async {
-                self.hideError()
-                switch result {
-                case .success(let movies):
-                    let currentlyDisplayedModelCount = self.viewModel.model.count - movies.count
-                    let indexPaths = movies.enumerated().map {
-                        IndexPath(item: currentlyDisplayedModelCount + $0.offset, section: 0)
-                    }
-                    self.collectionView.insertItems(at: indexPaths)
-                case .failure(let error):
-                    self.showError(error.localizedDescription)
-                case .`init`:
-                    self.collectionView.reloadData()
-                case .loading:
-                    break
+            self.hideError()
+            self.collectionView.collectionViewLayout.invalidateLayout()
+            switch result {
+            case .success(let movies):
+                let currentlyDisplayedModelCount = self.viewModel.model.count - movies.count
+                let indexPaths = movies.enumerated().map {
+                    IndexPath(item: currentlyDisplayedModelCount + $0.offset, section: 0)
                 }
-                self.collectionView.collectionViewLayout.invalidateLayout()
+                self.collectionView.insertItems(at: indexPaths)
+            case .failure(let error):
+                self.showError(error.localizedDescription)
+            case nil:
+                self.collectionView.reloadData()
+            case .loading:
+                break
             }
         }
     }

@@ -8,19 +8,20 @@
 import Foundation
 
 final class Bindable<T> {
-    var value: T {
+    var value: T? {
         didSet {
+            assert(Thread.isMainThread || !notifyOnMainThread)
             observer?(value)
         }
     }
+    private var observer: ((T?) -> Void)?
+    private let notifyOnMainThread: Bool
     
-    private var observer: ((T) -> ())?
-    
-    func bind(observer: @escaping (T) -> ()) {
+    func bind(observer: @escaping (T?) -> Void) {
         self.observer = observer
     }
     
-    init(value: T) {
-        self.value = value
+    init(notifyOnMainThread: Bool = true) {
+        self.notifyOnMainThread = notifyOnMainThread
     }
 }

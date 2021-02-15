@@ -14,22 +14,18 @@ final class MoviesListCell: UICollectionViewCell {
     private lazy var posterImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
-        imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.clipsToBounds = true
         imageView.kf.indicatorType = .activity
         return imageView
     }()
     private lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        label.numberOfLines = 2
-        label.font = UIFont.boldSystemFont(ofSize: 17)
+        let label = UILabel(numberOfLines: 2, font: .boldSystemFont(ofSize: 17))
         label.adjustsFontSizeToFitWidth = true
         return label
     }()
     private lazy var titleView: UIView = {
         let titleView = UIView()
         titleView.backgroundColor = .systemBackground
-        titleView.translatesAutoresizingMaskIntoConstraints = false
         return titleView
     }()
     
@@ -44,12 +40,8 @@ final class MoviesListCell: UICollectionViewCell {
         titleView.addSubview(titleLabel)
         
         posterImageView.edgesToSuperview()
-        
-        titleView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
-        titleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        titleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-        
-        titleLabel.edgesToSuperview(insets: .init(top: 10, left: 10, bottom: 10, right: 10))
+        titleView.edgesToSuperview(excluding: .top)
+        titleLabel.edgesToSuperview(insets: .uniform(10))
     }
     
     override func layoutSubviews() {

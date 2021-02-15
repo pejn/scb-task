@@ -10,7 +10,6 @@ import Foundation
 protocol MoviesListViewModelType: class {
     var model: [Movie] { get }
     var result: Bindable<ApiState<[Movie], SCBError>> { get }
-
     func search(with searchTerm: String)
     func loadMore()
 }
@@ -19,7 +18,7 @@ final class MoviesListViewModel: MoviesListViewModelType {
     var model: [Movie] {
         return currentState.movies
     }
-    let result: Bindable<ApiState<[Movie], SCBError>> = .init(value: .`init`)
+    let result: Bindable<ApiState<[Movie], SCBError>> = .init()
     
     private struct State {
         var currentPage = 1
@@ -41,7 +40,7 @@ final class MoviesListViewModel: MoviesListViewModelType {
     
     func search(with searchTerm: String) {
         currentState = State(searchTerm: searchTerm)
-        result.value = .`init`
+        result.value = nil
         debouncedSearch.call { [weak self] in
             self?.requestAPI(searchTerm: searchTerm)
         }

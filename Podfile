@@ -6,3 +6,4 @@ target 'scb-recruitment-taskTests'
 
 pod 'Alamofire'
 pod 'Kingfisher'
+pod 'TinyConstraints'

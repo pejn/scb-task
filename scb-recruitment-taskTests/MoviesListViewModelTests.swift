@@ -16,8 +16,6 @@ final class MoviesListViewModelTests: XCTestCase {
             XCTFail("Incorrect initial state")
         }
         
-        sut.search(with: "title")
-        
         let loadingExpectation = XCTestExpectation(description: "Expect for loading state")
         sut.result.bind { result in
             if case .loading = result {
@@ -25,21 +23,22 @@ final class MoviesListViewModelTests: XCTestCase {
             }
         }
         
+        sut.search(with: "title")
+        
         wait(for: [loadingExpectation], timeout: 2)
     }
     
-    
     func testFailureState() {
         let sut = MoviesListViewModel(apiService: ApiServiceStub())
-        sut.search(with: "error")
         
         let expectation = XCTestExpectation(description: "Expect an error")
-        
         sut.result.bind { result in
             if case .failure = result {
                 expectation.fulfill()
             }
         }
+        
+        sut.search(with: ApiServiceStub.errorSearchTerm)
         
         wait(for: [expectation], timeout: 2)
     }
@@ -49,8 +48,6 @@ final class MoviesListViewModelTests: XCTestCase {
         
         XCTAssertTrue(sut.model.isEmpty)
         
-        sut.search(with: "title")
-        
         let moviesExpectation = XCTestExpectation(description: "Expect for new movies")
         sut.result.bind { result in
             if case .success = result {
@@ -59,19 +56,13 @@ final class MoviesListViewModelTests: XCTestCase {
             }
         }
         
+        sut.search(with: "title")
+        
         wait(for: [moviesExpectation], timeout: 2)
     }
     
     func testLoadingMore() {
         let sut = MoviesListViewModel(apiService: ApiServiceStub())
-        sut.search(with: "title")
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
-            sut.loadMore()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
-                sut.loadMore()
-            })
-        })
         
         let expectation = XCTestExpectation(description: "Expect to receive results on each load")
         expectation.expectedFulfillmentCount = 3
@@ -91,6 +82,15 @@ final class MoviesListViewModelTests: XCTestCase {
                 }
             }
         }
+        
+        sut.search(with: "title")
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
+            sut.loadMore()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
+                sut.loadMore()
+            })
+        })
         
         wait(for: [expectation, modelSizeExpectation1, modelSizeExpectation2], timeout: 5)
     }
